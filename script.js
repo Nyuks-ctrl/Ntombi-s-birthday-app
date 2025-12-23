@@ -118,3 +118,9 @@ function typeMessage(text) {
   }, 40); // 40ms per character
 }
 
+setTimeout(() => {
+  img.src = slides[index].image;
+  typeMessage(slides[index].text);
+  img.style.opacity = 1;
+
+}, 300);
