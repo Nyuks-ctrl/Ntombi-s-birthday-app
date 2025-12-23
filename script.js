@@ -31,86 +31,33 @@ const slides = [
 
 ];
 
+
 let index = 0;
 let musicStarted = false;
 
 const img = document.getElementById("mainImage");
 const msg = document.getElementById("message");
 const bgMusic = document.getElementById("bgMusic");
-
-document.getElementById("nextBtn").onclick = () => {
-
-  if (!musicStarted) {
-    bgMusic.volume = 0.25;
-    bgMusic.play();
-    musicStarted = true;
-  }
-
-  index++;
-
-  if (index >= slides.length) return;
-
-  img.style.opacity = 0;
-
-  setTimeout(() => {
-    img.src = slides[index].image;
-    msg.innerText = slides[index].text;
-    img.style.opacity = 1;
-  }, 300);
-};
-
 const nextBtn = document.getElementById("nextBtn");
 const replayBtn = document.getElementById("replayBtn");
 const messageBox = document.getElementById("messageBox");
 
-nextBtn.onclick = () => {
-
-  if (!musicStarted) {
-    bgMusic.volume = 0.25;
-    bgMusic.play();
-    musicStarted = true;
-  }
-
-  index++;
-
-  if (index >= slides.length) return;
-
-  img.style.opacity = 0;
-
-  setTimeout(() => {
-    img.src = slides[index].image;
-    msg.innerText = slides[index].text;
-    img.style.opacity = 1;
-
-    // Final GIF: hide buttons and message
-    if (index === slides.length - 1) {
-      nextBtn.style.display = "none";
-      messageBox.style.display = "none";
-      replayBtn.style.display = "block"; // show replay
-      img.classList.add("final-gif");
-    }
-  }, 300);
-};
-
-// Replay button click
-replayBtn.onclick = () => {
-  index = 0;
-  img.classList.remove("final-gif");
-  img.src = slides[0].image;
-  msg.innerText = slides[0].text;
-  img.style.opacity = 1;
-
-  replayBtn.style.display = "none";
-  nextBtn.style.display = "block";
-  messageBox.style.display = "block";
-};
-
+// Typewriter + emoji pop effect
 function typeMessage(text) {
-  msg.innerText = "";
+  msg.innerHTML = "";
   let i = 0;
+
   const interval = setInterval(() => {
     if (i < text.length) {
-      msg.innerText += text.charAt(i);
+      let char = text.charAt(i);
+
+      // Wrap emojis in span for pop animation
+      if (/[🎉✨💙😊]/.test(char)) {
+        msg.innerHTML += `<span class="emoji">${char}</span>`;
+      } else {
+        msg.innerHTML += char;
+      }
+
       i++;
     } else {
       clearInterval(interval);
@@ -118,9 +65,60 @@ function typeMessage(text) {
   }, 40); // 40ms per character
 }
 
-setTimeout(() => {
-  img.src = slides[index].image;
-  typeMessage(slides[index].text);
-  img.style.opacity = 1;
+// Handle Next button click
+nextBtn.onclick = () => {
 
-}, 300);
+  // Start background music after first click
+  if (!musicStarted) {
+    bgMusic.volume = 0.25;
+    bgMusic.play();
+    musicStarted = true;
+  }
+
+  index++;
+
+  if (index >= slides.length) return;
+
+  // Fade out current image
+  img.style.opacity = 0;
+
+  setTimeout(() => {
+    img.src = slides[index].image;
+
+    // For slides with text, type it
+    if (slides[index].text) {
+      messageBox.style.display = "block";
+      typeMessage(slides[index].text);
+    } else {
+      // Hide messageBox for final GIF
+      messageBox.style.display = "none";
+    }
+
+    // Fade in image
+    img.style.opacity = 1;
+
+    // Final GIF logic
+    if (index === slides.length - 1) {
+      nextBtn.style.display = "none";
+      replayBtn.style.display = "block";
+      replayBtn.classList.add("pulse");
+      img.classList.add("final-gif");
+    }
+
+  }, 300);
+};
+
+// Handle Replay button click
+replayBtn.onclick = () => {
+  index = 0;
+  img.classList.remove("final-gif");
+  img.src = slides[0].image;
+
+  messageBox.style.display = "block";
+  replayBtn.style.display = "none";
+  replayBtn.classList.remove("pulse");
+
+  typeMessage(slides[0].text);
+  img.style.opacity = 1;
+  nextBtn.style.display = "block";
+};
