@@ -104,3 +104,17 @@ replayBtn.onclick = () => {
   nextBtn.style.display = "block";
   messageBox.style.display = "block";
 };
+
+function typeMessage(text) {
+  msg.innerText = "";
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < text.length) {
+      msg.innerText += text.charAt(i);
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 40); // 40ms per character
+}
+
